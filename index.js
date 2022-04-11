@@ -1,36 +1,20 @@
+import {characterData} from './data.js'
 
-// Data Variables for characters
-const hero = {
-    elementId: 'hero',
-    name: 'Wizard',
-    avatar: 'images/wizard-1.jpg',
-    health: 60,
-    diceRoll: 10
+import Character from '/Character.js'
+
+
+
+//** FUNCTION - renders html for each character
+function render() {
+document.getElementById('hero').innerHTML = wizard.getCharacterHtml()
+
+document.getElementById('monster').innerHTML = orc.getCharacterHtml()
 }
 
-const monster = {
-    elementId: 'monster',
-    name: 'Orc',
-    avatar: 'images/orc-1.jpg',
-    health: 10,
-    diceRoll: 4
-}
+// Creates each new character 
+const wizard = new Character(characterData.hero)
+const orc = new Character (characterData.monster)
+render();
 
 
 
-//**FUNCTION - dynamically creates html for each character */
-function renderCharacter(data) {
-    const { elementId, name, avatar, health, diceRoll } = data
-    document.getElementById(elementId).innerHTML = `
-                <div class="character-card">
-                    <h4 class="name">${name}</h4>
-                    <img class="avatar" src="${avatar}"/>
-                    <p class="health">health: <b>${health}</b></p>
-                    <div class="dice-container"><div class="dice">${diceRoll}</div></div>
-                </div>        
-`
-}
-
-renderCharacter(hero)
-
-renderCharacter(monster)
