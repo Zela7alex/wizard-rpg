@@ -1,42 +1,70 @@
 
 
-import {getDiceRollArray} from '/utils.js'
+import {getDiceRollArray, getDicePlaceholderHtml} from '/utils.js'
+
+const getPercentage = (remainingHealth, maximumHealth) => (100 * remainingHealth)/ maximumHealth
 
 
 //*** CONSTRUCTOR FUNCTION - creates new characters 
 function Character(data){
     Object.assign(this, data)
+    this.maxHealth = this.health
 
-    //** Method inside Constructor that creates the html for each character 
+    this.diceArray = getDicePlaceholderHtml(this.diceCount)
+
+    this.takeDamage = function (attackScoreArray) {
+        const totalAttackScore = attackScoreArray.reduce(function(total, num){
+            return total + num
+        })
+        this.health -= totalAttackScore
+        if (this.health <= 0){
+            this.dead = true
+            this.health = 0
+        }
+    }
+
+    this.getHealthBarHtml = function () {
+        const percent = getPercentage(this.health, this.maxHealth)
+        return `<div class="health-bar-outer">
+        <div class="health-bar-inner ${percent < 26 ? "danger" : ''}" 
+            style="width: ${percent}%;">
+        </div>
+    </div>`
+    }
+
+
+
     this.getCharacterHtml = function () {
-        //^^Destructored object for character data 
-    const { elementId, name, avatar, health, diceRoll, diceCount } = this
-
-    //^^generating html for diceCount, this will now create the html for the total dice 
+    //Destructored object for character data >>>
+    const { elementId, name, avatar, health, diceRoll, diceCount, diceArray } = this
+    //generating html for diceCount, this will now create the html for the total dice >>>
     const diceHtml = this.getDiceHtml(diceCount)
-
-    //^^Template literal that generates html for each character card
+    //
+    const healthBar = this.getHealthBarHtml()
+    //Template literal that generates html for each character card>>
     return`
                 <div class="character-card">
                     <h4 class="name">${name}</h4>
                     <img class="avatar" src="${avatar}"/>
-                    <p class="health">health: <b>${health}</b></p>
+                    <div class="health">health: <b>${health}</b></div>
+                    ${healthBar}
                     <div class="dice-container"> 
-                    ${diceHtml}
+                    ${diceArray}
                 </div>        
 `
 
     }
 
-    //**Method inside Constructor that generates html for dice --- gets diceRollArray() and generates the html that gets pushed to ${diceHtml} in getCharacterHtml() Method.
+    //Method inside Constructor that generates html for dice --- gets diceRollArray() and generates the html that gets pushed to ${diceHtml} in getCharacterHtml() Method. >>>
 
-    this.getDiceHtml = function (diceCount){
-        return getDiceRollArray(diceCount).map(function(num){
+    this.getDiceHtml = function (){
+        this.currentDiceScore = getDiceRollArray(this.diceCount)
+        this.diceArray = this.currentDiceScore.map(function(num){
             return `<div class="dice">${num}</div>`
         }).join('')
 
-        // Remmeber to change getDiceHtml invoke inside getCharacterHtml method to this.getDiceHtml
+      
     }
-}
+};
 
 export default Character
