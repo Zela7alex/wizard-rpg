@@ -1,40 +1,41 @@
 import { characterData } from './data.js'
+import Character from './Character.js'
 
-import Character from '/Character.js'
-
-
-// Creates each new character 
-const wizard = new Character(characterData.hero)
-const orc = new Character(characterData.monster)
+let monstersArray = ["orc", "demon", "goblin"];
 
 
-//** FUNCTION - renders html for each character
-function render() {
-    document.getElementById('hero').innerHTML = wizard.getCharacterHtml()
-
-    document.getElementById('monster').innerHTML = orc.getCharacterHtml()
+function getNewMonster() {
+  // extracting all the data from Character data to then remove each character from array so it changes to a new character >>>
+  const nextMonsterData = characterData[monstersArray.shift()]
+  return nextMonsterData ? new Character(nextMonsterData) : {}
 }
-render();
 
 
 function attack() {
   wizard.takeDamage(wizard.currentDiceScore)
-  orc.takeDamage(orc.currentDiceScore)
+  monster.takeDamage(monster.currentDiceScore)
   wizard.getDiceHtml()
-  orc.getDiceHtml()
+  monster.getDiceHtml()
   render();
 
-  if (wizard.dead || orc.dead){
+  if (wizard.dead) {
     endGame();
+  } else if (monster.dead) {
+    if (monstersArray.length > 0) {
+      monster = getNewMonster()
+   
+    } else {
+      endGame()
+    }
   }
 }
 
 function endGame() {
-  const endMessage = wizard.health === 0 && orc.health === 0 ? "No victors - all creatures are dead" : 
-  wizard.health > 0 ? 'The Wizard Wins' :
-  "The Orc is Victorious"
+  const endMessage = wizard.health === 0 && monster.health === 0 ? "No victors - all creatures are dead" :
+    wizard.health > 0 ? 'The Wizard Wins' :
+      "The Orc is Victorious"
 
-  const endEmoji = wizard.health > 0 ? "🔮" :"☠️"
+  const endEmoji = wizard.health > 0 ? "🔮" : "☠️"
   document.body.innerHTML = `<div class="end-game">
     <h2>Game Over</h2>
     <h3>${endMessage}</h3>
@@ -42,4 +43,17 @@ function endGame() {
     </div>`
 }
 
-document.getElementById('attack-button').addEventListener('click', attack) 
+document.getElementById('attack-button').addEventListener('click', attack)
+
+// Creates each new character 
+const wizard = new Character(characterData.hero)
+let monster = getNewMonster()
+render();
+
+//** FUNCTION - renders html for each character
+function render() {
+  document.getElementById('hero').innerHTML = wizard.getCharacterHtml()
+
+  document.getElementById('monster').innerHTML = monster.getCharacterHtml()
+}
+
